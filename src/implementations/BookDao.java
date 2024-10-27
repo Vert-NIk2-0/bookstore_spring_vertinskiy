@@ -6,11 +6,7 @@ import java.util.List;
 
 public interface BookDao {
 
-    void createRS(Book book);
-
     void createBook(Book book);
-
-    void updateRS(Book book);
 
     List<Book> getAllBooks();
 
@@ -22,5 +18,4 @@ public interface BookDao {
 
     Long countAll();
 
-    void printTableInfo();
 }
