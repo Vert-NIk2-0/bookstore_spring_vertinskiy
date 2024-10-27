@@ -27,9 +27,8 @@ public class BookImpl extends Implementation implements BookDao{
     private static final String CREATE_BOOK =
             "INSERT INTO books (author, bookname, isbn, number_of_pages, price, year) " +
                     "VALUES(?, ?, ?, ?, ?, ?)";
-
-    private static final String UPDATE_BOOK_BY_ID =
-            "SELECT author, bookname, isbn, number_of_pages, price, year FROM books WHERE isbn = ?";
+    private static final String UPDATE_BOOK_BY_ISBN =
+            "UPDATE books SET author = ?, bookname = ?, isbn = ?, number_of_pages = ?, price = ?, year = ? WHERE isbn = ?";
 
     private static final String SELECT_ALL_COLUMNS =
             "SELECT author, bookname, isbn, number_of_pages, price, year FROM books";
@@ -54,6 +53,24 @@ public class BookImpl extends Implementation implements BookDao{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Book updateBook(Book book, String oldIsbn) {
+        try (PreparedStatement statement = getConnection().prepareStatement(UPDATE_BOOK_BY_ISBN)) {
+            statement.setString(1, book.getAuthor());
+            statement.setString(2, book.getBookname());
+            statement.setString(3, book.getIsbn());
+            statement.setObject(4, book.getNumberOfPages());
+            statement.setBigDecimal(5, book.getPrice());
+            statement.setObject(6, book.getYear());
+            statement.setString(7, oldIsbn);
+
+            statement.executeUpdate();
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return book;
     }
 
     @Override

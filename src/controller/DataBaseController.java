@@ -10,7 +10,6 @@ import java.util.Scanner;
 public class DataBaseController {
     public static void main(String[] args) {
         BookImpl db = new BookImpl();
-        db.printTableInfo();
         Scanner scanner = new Scanner(System.in);
 
         while(true) {
@@ -184,11 +183,13 @@ public class DataBaseController {
                     System.out.println("Book update:");
 
                     System.out.println("Enter the ISBN of the book you want to change");
+                    String oldIsbn = null;
+
                     while (true) {
                         String input = scanner.nextLine();
-
                         if (input.matches("\\d{13}")) {
                             book = db.getBookByIsbn(input);
+                            oldIsbn = book.getIsbn();
                             System.out.println(book);
                             break;
                         }else {
@@ -225,7 +226,7 @@ public class DataBaseController {
                             }
                         }
                         if (numberUpdate == 0) {
-                            db.updateRS(book);
+                            db.updateBook(book, oldIsbn);
                             System.out.println("Update result:\n" + book);
                             break;
                         }
