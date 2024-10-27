@@ -165,10 +165,10 @@ public class BookImpl extends Implementation implements BookDao{
     }
 
     @Override
-    public boolean deleteBookById(String id) {
+    public boolean deleteBookById(Long id) {
         int resultUpdate = 0;
         try (PreparedStatement statement = getConnection().prepareStatement(DELETE_BOOK_BY_ISBN)){
-            statement.setString(1, id);
+            statement.setLong(1, id);
             resultUpdate = statement.executeUpdate();
 
         } catch (SQLException e) {
