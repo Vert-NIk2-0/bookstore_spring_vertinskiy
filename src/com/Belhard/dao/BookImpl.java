@@ -154,7 +154,7 @@ public class BookImpl extends Implementation implements BookDao{
 
     @Override
     public boolean deleteBookByIsbn(String isbn) {
-        int resultUpdate = 0;
+        int resultUpdate;
         try (PreparedStatement statement = getConnection().prepareStatement(DELETE_BOOK_BY_ISBN)){
             statement.setString(1, isbn);
             resultUpdate = statement.executeUpdate();

@@ -392,7 +392,7 @@ public class DataBaseController {
 //======================================================BY=ISBN=====================================================
                 case 5:
                     System.out.println("Display information about a book by ISBN:\n");
-                    System.out.println("Enter the ISBN of the book you want to change");
+                    System.out.println("Enter the ISBN of the book you want to display");
                     String isbnDisplay = "";
                     while (true) {
 
