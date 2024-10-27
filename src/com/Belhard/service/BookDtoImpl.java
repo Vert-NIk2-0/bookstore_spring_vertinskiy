@@ -4,6 +4,7 @@ import com.Belhard.dao.BookDao;
 import com.Belhard.model.Book;
 import com.Belhard.model.BookDto;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +65,15 @@ public class BookDtoImpl implements BookService {
         bookDao.deleteBookById(id);
 
         return bookDao.deleteBookById(id);
+    }
+
+    @Override
+    public BigDecimal getCostAuthorsBooks(String author) {
+        BigDecimal result = new BigDecimal(0);
+        for (Book book : bookDao.getByAuthor(author)) {
+            result = result.add(book.getPrice());
+        }
+        return result;
     }
 
     private static void setBookDto(BookDto bookDto, Book book) {

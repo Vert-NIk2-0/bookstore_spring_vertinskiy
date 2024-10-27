@@ -2,6 +2,7 @@ package com.Belhard.service;
 
 import com.Belhard.model.BookDto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface BookService {
@@ -14,5 +15,7 @@ public interface BookService {
     BookDto update(BookDto dto);
 
     boolean delete(Long id);
+
+    BigDecimal getCostAuthorsBooks(String author);
 
 }
