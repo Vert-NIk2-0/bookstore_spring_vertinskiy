@@ -1,4 +1,4 @@
-package implementations;
+package com.Belhard.implementations;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
