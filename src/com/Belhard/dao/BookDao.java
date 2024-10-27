@@ -8,7 +8,7 @@ public interface BookDao {
 
     void createBook(Book book);
 
-    Book updateBook(Book book, String oldIsbn);
+    Book updateBook(Book book);
 
     List<Book> getAllBooks();
 
