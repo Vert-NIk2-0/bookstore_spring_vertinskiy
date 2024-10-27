@@ -416,7 +416,6 @@ public class DataBaseController {
                         isbnRemove = scanner.nextLine();
 
                         if (isbnRemove.matches("\\d{13}")) {
-
                             try {
                                 book = db.getBookByIsbn(isbnRemove);
                             }catch (RuntimeException e) {

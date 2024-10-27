@@ -23,15 +23,21 @@ public class BookImpl extends Implementation implements BookDao{
     private static final String DELETE_BOOK_BY_ISBN =
             "DELETE FROM books WHERE isbn = ?";
 
+    private static final String DELETE_BOOK_BY_ID =
+            "DELETE FROM books WHERE id = ?";
+
     private static final String CREATE_BOOK =
             "INSERT INTO books (author, bookname, isbn, number_of_pages, price, year) " +
                     "VALUES(?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_BOOK_BY_ISBN =
-            "UPDATE books SET author = ?, bookname = ?, isbn = ?, number_of_pages = ?, price = ?, year = ? WHERE isbn = ?";
+            "UPDATE books " +
+                    "SET author = ?, bookname = ?, isbn = ?, number_of_pages = ?, price = ?, year = ? WHERE isbn = ?";
 
     private static final String SELECT_ALL_COLUMNS =
             "SELECT author, bookname, isbn, number_of_pages, price, year FROM books";
 
+    private static final String SELECT_BOOK_BY_ID =
+            "SELECT * FROM books WHERE id = ?";
 
     @Override
     public void createBook(Book book) {
@@ -113,6 +119,22 @@ public class BookImpl extends Implementation implements BookDao{
     }
 
     @Override
+    public Book getBookById(Long id) {
+        Book book = new Book();
+        try (PreparedStatement statement = getConnection().prepareStatement(SELECT_BOOK_BY_ID)){
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+
+            setData(book, resultSet);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return book;
+    }
+
+    @Override
     public List<Book> getByAuthor(String author) {
         List<Book> bookList = new ArrayList<>();
         try (PreparedStatement statement = getConnection().prepareStatement(SELECT_BOOK_BY_AUTHOR)){
@@ -134,6 +156,19 @@ public class BookImpl extends Implementation implements BookDao{
         int resultUpdate = 0;
         try (PreparedStatement statement = getConnection().prepareStatement(DELETE_BOOK_BY_ISBN)){
             statement.setString(1, isbn);
+            resultUpdate = statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return resultUpdate > 0;
+    }
+
+    @Override
+    public boolean deleteBookById(String id) {
+        int resultUpdate = 0;
+        try (PreparedStatement statement = getConnection().prepareStatement(DELETE_BOOK_BY_ISBN)){
+            statement.setString(1, id);
             resultUpdate = statement.executeUpdate();
 
         } catch (SQLException e) {
