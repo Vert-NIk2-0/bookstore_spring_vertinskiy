@@ -1,7 +1,7 @@
-package controller;
+package com.Belhard.controller;
 
-import implementations.BookImpl;
-import model.Book;
+import com.Belhard.dao.BookImpl;
+import com.Belhard.model.Book;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,7 +10,6 @@ import java.util.Scanner;
 public class DataBaseController {
     public static void main(String[] args) {
         BookImpl db = new BookImpl();
-        db.printTableInfo();
         Scanner scanner = new Scanner(System.in);
 
         while(true) {
@@ -20,7 +19,7 @@ public class DataBaseController {
                     Main menu (select action number):
                     
                     1 - Add new book
-                    2 - Update an existing book by ISBN
+                    2 - Update an existing book by ID
                     3 - Display information about all books
                     4 - Display information about the author's books
                     5 - Display information about a book by ISBN
@@ -183,16 +182,22 @@ public class DataBaseController {
                 case 2:
                     System.out.println("Book update:");
 
-                    System.out.println("Enter the ISBN of the book you want to change");
-                    while (true) {
-                        String input = scanner.nextLine();
+                    System.out.println("Enter the ID of the book you want to change");
 
-                        if (input.matches("\\d{13}")) {
-                            book = db.getBookByIsbn(input);
-                            System.out.println(book);
-                            break;
-                        }else {
-                            System.out.println("Invalid input. Please try again");
+                    Long idUpdate;
+                    while (true) {
+                        if (scanner.hasNextInt()) {
+                            idUpdate = scanner.nextLong();
+                            if (idUpdate >=0) {
+                                book = db.getBookById(idUpdate);
+                                scanner.nextLine();
+                                break;
+                            } else {
+                                System.out.println("Invalid input. Please try again");
+                            }
+                        } else {
+                            System.out.println("Oops, you entered something wrong... Please try again");
+                            scanner.next();
                         }
                     }
 
@@ -225,7 +230,7 @@ public class DataBaseController {
                             }
                         }
                         if (numberUpdate == 0) {
-                            db.updateRS(book);
+                            db.updateBook(book);
                             System.out.println("Update result:\n" + book);
                             break;
                         }
@@ -387,7 +392,7 @@ public class DataBaseController {
 //======================================================BY=ISBN=====================================================
                 case 5:
                     System.out.println("Display information about a book by ISBN:\n");
-                    System.out.println("Enter the ISBN of the book you want to change");
+                    System.out.println("Enter the ISBN of the book you want to display");
                     String isbnDisplay = "";
                     while (true) {
 
@@ -398,6 +403,7 @@ public class DataBaseController {
                                 book = db.getBookByIsbn(isbnDisplay);
                             }catch (RuntimeException e) {
                                 System.out.println("This ISBN does not exist");
+                                break;
                             }
                             System.out.println(book);
                             break;
@@ -415,7 +421,6 @@ public class DataBaseController {
                         isbnRemove = scanner.nextLine();
 
                         if (isbnRemove.matches("\\d{13}")) {
-
                             try {
                                 book = db.getBookByIsbn(isbnRemove);
                             }catch (RuntimeException e) {
