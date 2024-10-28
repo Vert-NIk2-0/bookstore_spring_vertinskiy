@@ -8,7 +8,7 @@ import java.util.Objects;
 public class User {
     private Long id;
     private String firstName;
-    private String secondName;
+    private String lastName;
     private String email;
     private Date dateOfBirth;
     private String phoneNumber;
@@ -30,12 +30,12 @@ public class User {
         this.firstName = firstName;
     }
 
-    public String getSecondName() {
-        return secondName;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -75,12 +75,12 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(secondName, user.secondName) && Objects.equals(email, user.email) && Objects.equals(dateOfBirth, user.dateOfBirth) && Objects.equals(phoneNumber, user.phoneNumber) && gender == user.gender;
+        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(dateOfBirth, user.dateOfBirth) && Objects.equals(phoneNumber, user.phoneNumber) && gender == user.gender;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, secondName, email, dateOfBirth, phoneNumber, gender);
+        return Objects.hash(id, firstName, lastName, email, dateOfBirth, phoneNumber, gender);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class User {
         return "User{" +
                 "id=" + id +
                 ", first_name='" + firstName + '\'' +
-                ", secondName='" + secondName + '\'' +
+                ", secondName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
                 ", phonenumber='" + phoneNumber + '\'' +

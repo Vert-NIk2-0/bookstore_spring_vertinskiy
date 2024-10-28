@@ -1,14 +1,14 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
-    second_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     date_of_birth DATE,
     phone_number VARCHAR(20),
     gender VARCHAR(10)
 );
 
-INSERT INTO users (first_name, second_name, email, date_of_birth, phone_number, gender)
+INSERT INTO users (first_name, last_name, email, date_of_birth, phone_number, gender)
 VALUES
     ('John', 'Doe', 'john.doe@example.com', '1985-01-15', '1234567890', 'Male'),
     ('Jane', 'Smith', 'jane.smith@example.com', '1990-02-20', '0987654321', 'Female'),
