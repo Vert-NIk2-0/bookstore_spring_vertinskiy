@@ -304,7 +304,6 @@ public class UserController {
                                 
                                 1 - male
                                 2 - female
-                                
                                 """);
 
                         while (true) {
@@ -380,7 +379,6 @@ public class UserController {
                 } else {
                     try {
                         date = new Date(year - 1900, month - 1, day);
-                        System.out.println(date);
                         break;
                     } catch (DateTimeException e) {
                         System.out.println("There can't be a day like this");
@@ -391,7 +389,6 @@ public class UserController {
                 scanner.next();
             }
         }
-        System.out.println(date);
         return date;
     }
 

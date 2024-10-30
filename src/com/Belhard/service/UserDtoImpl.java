@@ -33,10 +33,14 @@ public class UserDtoImpl extends Implementation implements UserService{
 
     @Override
     public User login(String email, String password) {
-        User user = userDao.getUserByEmail(email);
+        try {
+            User user = userDao.getUserByEmail(email);
+            if (user != null && user.getPassword().equals(password)) {
+                return user;
+            }
 
-        if (user != null && user.getPassword().equals(password)) {
-            return user;
+        }catch (RuntimeException e) {
+            System.out.println("This email already exists");
         }
 
         return null;
