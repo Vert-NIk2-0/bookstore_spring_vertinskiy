@@ -81,7 +81,6 @@ public class UserDto {
         return "UserDto{" +
                 "id=" + id +
                 ", login='" + login + '\'' +
-                ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
                 ", dateOfBirth=" + formatter.format(dateOfBirth) +
                 ", gender=" + gender +

@@ -124,7 +124,6 @@ public class User {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", gender=" + gender +
                 ", login='" + login + '\'' +
-                ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }
