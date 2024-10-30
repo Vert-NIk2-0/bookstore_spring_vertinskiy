@@ -20,15 +20,15 @@ INSERT INTO genders (gender) VALUES ('male'), ('female');
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100) UNIQUE NOT NULL,
     date_of_birth DATE,
     phone_number VARCHAR(20),
     gender_id INT REFERENCES genders(id),
     login VARCHAR(50) NOT NULL,
     password VARCHAR(20) NOT NULL,
-    role_id INT REFERENCES roles(id)
+    role_id INT REFERENCES roles(id) DEFAULT (SELECT id FROM roles WHERE role = 'user')
 );
 
 INSERT INTO users (first_name, last_name, email, date_of_birth, phone_number, gender_id, login, password, role_id)
