@@ -131,10 +131,10 @@ public class UserImpl extends Implementation implements UserDao{
     }
 
     @Override
-    public User getUserById(Integer id) {
+    public User getUserById(Long id) {
         User user = new User();
         try (PreparedStatement statement = getConnection().prepareStatement(GET_USER_BY_ID)) {
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
 
@@ -169,9 +169,9 @@ public class UserImpl extends Implementation implements UserDao{
     }
 
     @Override
-    public boolean deleteUserById(Integer id) {
+    public boolean deleteUserById(Long id) {
         try (PreparedStatement statement = getConnection().prepareStatement(DELETE_USER_BY_ID)) {
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             return statement.executeUpdate() == 1;
         }catch (SQLException e){
             throw new RuntimeException(e);

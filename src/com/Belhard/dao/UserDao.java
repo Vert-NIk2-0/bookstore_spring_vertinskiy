@@ -13,11 +13,11 @@ public interface UserDao {
 
     List<User> getUsersByLastName(String lastName);
 
-    User getUserById(Integer id);
+    User getUserById(Long id);
 
     User getUserByEmail(String email);
 
-    boolean deleteUserById(Integer id);
+    boolean deleteUserById(Long id);
 
     Long countAll();
 }
