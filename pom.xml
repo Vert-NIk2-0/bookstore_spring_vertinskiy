@@ -9,12 +9,21 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <groupId>com.Belhard</groupId>
     <artifactId>bookstore</artifactId>
     <version>1.0</version>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.sourse>21</maven.compiler.sourse>
         <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.4</version>
+        </dependency>
+
+    </dependencies>
 
     <build>
         <plugins>
