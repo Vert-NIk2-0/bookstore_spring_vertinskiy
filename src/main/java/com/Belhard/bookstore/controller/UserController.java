@@ -6,6 +6,8 @@ import com.Belhard.bookstore.enums.Role;
 import com.Belhard.bookstore.model.User;
 import com.Belhard.bookstore.model.UserDto;
 import com.Belhard.bookstore.service.UserDtoImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Date;
 import java.time.DateTimeException;
@@ -15,6 +17,7 @@ import java.util.Scanner;
 
 public class UserController {
 
+    private static final Logger logger = LogManager.getLogger(UserController.class);
     private static final UserImpl userImpl = new UserImpl();
     private static final Scanner scanner = new Scanner(System.in);
 
@@ -375,6 +378,7 @@ public class UserController {
                         date = new Date(year - 1900, month - 1, day);
                         break;
                     } catch (DateTimeException e) {
+                        logger.error("Date validity error");
                         System.out.println("There can't be a day like this");
                     }
                 }
@@ -395,12 +399,14 @@ public class UserController {
             System.out.println("Enter user ID: ");
             if (scanner.hasNextLong()) {
                 Long userId = scanner.nextLong();
-                try {
-                    updateUser = userImpl.getUserById(userId);
-                    break;
-                } catch (RuntimeException e) {
+
+                updateUser = userImpl.getUserById(userId);
+                if (updateUser == null) {
                     System.out.println("There is no user with this ID");
+                    continue;
                 }
+                break;
+
             } else {
                 System.out.println("Oops, you entered something wrong... Please try again");
                 scanner.next();
@@ -485,6 +491,7 @@ public class UserController {
                 }
             } catch (RuntimeException e) {
                 System.out.println();
+                logger.error("Error displaying user by id");
                 System.out.println("There is no such ID");
             }
         }

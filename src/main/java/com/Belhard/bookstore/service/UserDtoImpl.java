@@ -4,10 +4,13 @@ import com.Belhard.bookstore.dao.UserDao;
 import com.Belhard.bookstore.implementations.Implementation;
 import com.Belhard.bookstore.model.User;
 import com.Belhard.bookstore.model.UserDto;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class UserDtoImpl extends Implementation implements UserService{
 
-    private UserDao userDao;
+    private final UserDao userDao;
+    private static final Logger logger = LogManager.getLogger(UserDtoImpl.class);
 
     public UserDtoImpl(UserDao userDao) {
         this.userDao = userDao;
@@ -25,6 +28,7 @@ public class UserDtoImpl extends Implementation implements UserService{
         user.setGender(dto.getGender());
 
         userDao.createUser(user);
+        logger.debug("A new user has been created");
     }
 
     @Override
@@ -32,11 +36,13 @@ public class UserDtoImpl extends Implementation implements UserService{
         try {
             User user = userDao.getUserByEmail(email);
             if (user != null && user.getPassword().equals(password)) {
+                logger.debug("User is logged in");
                 return user;
             }
 
         }catch (RuntimeException e) {
-            System.out.println("This email already exists");
+            logger.error("Login error: email does not exist");
+            System.out.println("This email does not exist");
         }
 
         return null;

@@ -4,6 +4,9 @@ import com.Belhard.bookstore.enums.Gender;
 import com.Belhard.bookstore.enums.Role;
 import com.Belhard.bookstore.implementations.Implementation;
 import com.Belhard.bookstore.model.User;
+import com.Belhard.bookstore.service.UserDtoImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserImpl extends Implementation implements UserDao{
+
+    private static final Logger logger = LogManager.getLogger(UserImpl.class);
 
     private static final String SELECT_ALL_USERS =
             "SELECT u.id, u.first_name, u.last_name, u.email, u,date_of_birth, u.phone_number, g.gender, u.login, u.password, r.role " +
@@ -74,6 +79,7 @@ public class UserImpl extends Implementation implements UserDao{
             user.setId(generatedKeys.getLong("id"));
 
         }catch (SQLException e) {
+            logger.error("Error creating user");
             throw new RuntimeException(e);
         }
     }
@@ -90,6 +96,7 @@ public class UserImpl extends Implementation implements UserDao{
             statement.executeUpdate();
 
         }catch (SQLException e){
+            logger.error("Error updating user");
             throw new RuntimeException(e);
         }
         return user;
@@ -108,6 +115,7 @@ public class UserImpl extends Implementation implements UserDao{
                 userList.add(user);
             }
         }catch (SQLException e) {
+            logger.error("Error displaying user list");
             throw new RuntimeException(e);
         }
         return userList;
@@ -125,6 +133,7 @@ public class UserImpl extends Implementation implements UserDao{
                 userList.add(user);
             }
         }catch (SQLException e){
+            logger.error("Error displaying user list by last name");
             throw new RuntimeException(e);
         }
         return userList;
@@ -144,6 +153,7 @@ public class UserImpl extends Implementation implements UserDao{
                 return null;
             }
         }catch (SQLException e){
+            logger.error("Error displaying user by ID");
             throw new RuntimeException(e);
         }
         return user;
@@ -163,6 +173,7 @@ public class UserImpl extends Implementation implements UserDao{
                 return null;
             }
         }catch (SQLException e){
+            logger.error("Error displaying user by email");
             throw new RuntimeException(e);
         }
         return user;
@@ -174,6 +185,7 @@ public class UserImpl extends Implementation implements UserDao{
             statement.setLong(1, id);
             return statement.executeUpdate() == 1;
         }catch (SQLException e){
+            logger.error("Error deleting user");
             throw new RuntimeException(e);
         }
     }
@@ -186,6 +198,7 @@ public class UserImpl extends Implementation implements UserDao{
             if (resultSet.next())
                 rowCount = resultSet.getLong("row_count");
         } catch (SQLException e) {
+            logger.error("Error displaying the number of users");
             throw new RuntimeException(e);
         }
         return rowCount;
@@ -199,6 +212,7 @@ public class UserImpl extends Implementation implements UserDao{
 
             return resultSet.getInt("id");
         } catch (SQLException e) {
+            logger.error("Error getting gender id");
             throw new RuntimeException(e);
         }
     }
@@ -211,6 +225,7 @@ public class UserImpl extends Implementation implements UserDao{
 
             return resultSet.getInt("id");
         } catch (SQLException e) {
+            logger.error("Error getting role id");
             throw new RuntimeException(e);
         }
     }
