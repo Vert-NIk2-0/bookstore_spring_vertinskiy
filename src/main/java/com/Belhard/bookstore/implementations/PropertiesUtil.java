@@ -1,6 +1,5 @@
-package com.Belhard.implementations;
+package com.Belhard.bookstore.implementations;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;

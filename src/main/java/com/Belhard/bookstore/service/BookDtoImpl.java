@@ -1,8 +1,8 @@
-package com.Belhard.service;
+package com.Belhard.bookstore.service;
 
-import com.Belhard.dao.BookDao;
-import com.Belhard.model.Book;
-import com.Belhard.model.BookDto;
+import com.Belhard.bookstore.dao.BookDao;
+import com.Belhard.bookstore.model.Book;
+import com.Belhard.bookstore.model.BookDto;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

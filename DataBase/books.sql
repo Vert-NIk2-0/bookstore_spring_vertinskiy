@@ -3,12 +3,12 @@ CREATE TABLE books (
 	author VARCHAR(255) NOT NULL,
 	bookname VARCHAR(255) NOT NULL,
 	isbn CHAR(13) UNIQUE NOT NULL,
-	numberOfPages INT,
+	number_of_pages INT,
 	price DECIMAL(20, 2),
 	year INT
 )
 
-INSERT INTO books (author, bookname, isbn, numberofpages, price, year)
+INSERT INTO books (author, bookname, isbn, number_of_pages, price, year)
 VALUES
 	('Дж.Р.Р.Толкин', 'Властелин колец', 9780544003415, 1216, 6.50, 1954),
 	('Джордж Мартин', 'Игра престолов', 9780553103540, 694, 5.85, 1996),

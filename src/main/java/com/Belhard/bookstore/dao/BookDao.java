@@ -1,6 +1,6 @@
-package com.Belhard.dao;
+package com.Belhard.bookstore.dao;
 
-import com.Belhard.model.Book;
+import com.Belhard.bookstore.model.Book;
 
 import java.util.List;
 

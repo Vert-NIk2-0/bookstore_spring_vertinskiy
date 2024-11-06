@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <ThresholdFilter level="INFO" onMatch="DENY" onMismatch="ACCEPT"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+
+        <File name="File" fileName="logs/app.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
+        </File>
+    </Appenders>
+
+    <Loggers>
+
+
+        <Root level="all">
+            <AppenderRef ref="Console" level="debug"/>
+            <AppenderRef ref="File" level="info"/>
+        </Root>
+
+        <Logger name="com.Belhard.bookstore.implementations.Implementation" level="ALL" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File" level="INFO"/>
+        </Logger>
+
+        <Logger name="com.Belhard.bookstore.service" level="ALL" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <Logger name="com/Belhard/bookstore" level="ERROR" additivity="false">
+            <AppenderRef ref="File"/>
+        </Logger>
+
+    </Loggers>
+</Configuration>

@@ -1,7 +1,7 @@
-package com.Belhard.dao;
+package com.Belhard.bookstore.dao;
 
-import com.Belhard.implementations.Implementation;
-import com.Belhard.model.Book;
+import com.Belhard.bookstore.implementations.Implementation;
+import com.Belhard.bookstore.model.Book;
 
 import java.sql.*;
 import java.util.ArrayList;

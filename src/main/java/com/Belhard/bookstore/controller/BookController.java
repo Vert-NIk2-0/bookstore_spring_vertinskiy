@@ -1,13 +1,13 @@
-package com.Belhard.controller;
+package com.Belhard.bookstore.controller;
 
-import com.Belhard.dao.BookImpl;
-import com.Belhard.model.Book;
+import com.Belhard.bookstore.dao.BookImpl;
+import com.Belhard.bookstore.model.Book;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
 
-public class DataBaseController {
+public class BookController {
     public static void main(String[] args) {
         BookImpl db = new BookImpl();
         Scanner scanner = new Scanner(System.in);
