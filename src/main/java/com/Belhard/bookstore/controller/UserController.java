@@ -1,15 +1,15 @@
-package com.Belhard.bookstore.controller;
+package com.belhard.bookstore.controller;
 
-import com.Belhard.bookstore.dao.UserImpl;
-import com.Belhard.bookstore.enums.Gender;
-import com.Belhard.bookstore.enums.Role;
-import com.Belhard.bookstore.model.User;
-import com.Belhard.bookstore.model.UserDto;
-import com.Belhard.bookstore.service.UserDtoImpl;
+import com.belhard.bookstore.connection.impl.ConnectionManagerImpl;
+import com.belhard.bookstore.dao.impl.UserDaoImpl;
+import com.belhard.bookstore.dao.entity.Gender;
+import com.belhard.bookstore.dao.entity.Role;
+import com.belhard.bookstore.dao.entity.User;
+import com.belhard.bookstore.connection.impl.PropertiesUtilImpl;
+import com.belhard.bookstore.service.entity.UserDto;
+import com.belhard.bookstore.service.impl.UserDtoImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.sql.Date;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +18,13 @@ import java.util.Scanner;
 public class UserController {
 
     private static final Logger logger = LogManager.getLogger(UserController.class);
-    private static final UserImpl userImpl = new UserImpl();
+    private static final PropertiesUtilImpl PROPERTIES_UTIL_IMPL = new PropertiesUtilImpl("application.properties");
+    private static final String URL = PROPERTIES_UTIL_IMPL.get("db.url");
+    private static final String HOSTNAME = PROPERTIES_UTIL_IMPL.get("db.username");
+    private static final String PASSWORD = PROPERTIES_UTIL_IMPL.get("db.password");
+    private static final ConnectionManagerImpl CONNECTION_MANAGER_IMPL = new ConnectionManagerImpl(URL, HOSTNAME, PASSWORD);
+    private static final UserDaoImpl userImpl = new UserDaoImpl(CONNECTION_MANAGER_IMPL);
+    private static final UserDtoImpl userDto = new UserDtoImpl(userImpl);
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -55,7 +61,7 @@ public class UserController {
                 break;
             }
 
-            UserDtoImpl userDto = new UserDtoImpl(new UserImpl());
+
             switch (number) {
                 case 1:
 
@@ -74,7 +80,7 @@ public class UserController {
                         continue;
                     }
 //=======================================================USER=======================================================
-                    if (user.getRole() == Role.user) {
+                    if (user.getRole() == Role.USER) {
                         boolean existenceAccount = true;
 
                         while (true) {
@@ -120,13 +126,13 @@ public class UserController {
 //=======================================================PASSWORD=======================================================
                                 case 2:
                                     editPasswordLoggerUser(loginPassword, user);
-                                    userImpl.updateUser(user);
+                                    userImpl.update(user);
                                     break;
 
 //=======================================================ALL=USERS======================================================
                                 case 3:
                                     System.out.println("Display all users");
-                                    List<User> userList = userImpl.getAllUsers();
+                                    List<User> userList = userImpl.getAll();
                                     for (User printUser : userList) {
                                         System.out.println("User{" +
                                                 "id=" + printUser.getId() +
@@ -151,7 +157,7 @@ public class UserController {
                     }
 
 //=======================================================ADMIN=======================================================
-                    if (user.getRole() == Role.admin) {
+                    if (user.getRole() == Role.ADMIN) {
                         boolean existenceAccount = true;
 
                         while (true) {
@@ -200,7 +206,7 @@ public class UserController {
 //=======================================================PASSWORD=======================================================
                                 case 2:
                                     editPasswordLoggerUser(loginPassword, user);
-                                    userImpl.updateUser(user);
+                                    userImpl.update(user);
                                     break;
 
 //=======================================================ROLE===========================================================
@@ -211,7 +217,7 @@ public class UserController {
 //=======================================================ALL=USERS======================================================
                                 case 4:
                                     System.out.println("Display all users");
-                                    List<User> userList = userImpl.getAllUsers();
+                                    List<User> userList = userImpl.getAll();
                                     for (User printUser : userList) {
                                         System.out.println(printUser);
                                     }
@@ -222,7 +228,7 @@ public class UserController {
                                 case 5:
                                     System.out.println("Display users by last name");
                                     System.out.print("Enter last name: ");
-                                    List<User> userListLastName = userImpl.getUsersByLastName(scanner.nextLine());
+                                    List<User> userListLastName = userImpl.getByLastName(scanner.nextLine());
                                     if (userListLastName == null) {
                                         System.out.println("There is no such last name");
                                         break;
@@ -263,7 +269,7 @@ public class UserController {
                             System.out.print("\nEnter email: ");
                             if (scanner.hasNextLine()) {
                                 String email = scanner.nextLine();
-                                if (userImpl.getUserByEmail(email) == null) {
+                                if (userImpl.getByEmail(email) == null) {
                                     newUserDto.setEmail(email);
                                     break;
                                 } else {
@@ -317,7 +323,7 @@ public class UserController {
                                 scanner.next();
                             }
                         }
-                        newUserDto.setGender(number == 1 ? Gender.male : Gender.female);
+                        newUserDto.setGender(number == 1 ? Gender.MALE : Gender.FEMALE);
                     }
 
                     userDto.createNewUser(newUserDto);
@@ -327,14 +333,14 @@ public class UserController {
         }
     }
 
-    private static Date getDate() {
+    private static LocalDate getDate() {
         LocalDate currentDate = LocalDate.now();
 
         int year;
         int month;
         int day;
 
-        Date date = null;
+        LocalDate date = null;
         while (true) {
             System.out.println("Enter year");
             if (scanner.hasNextInt()) {
@@ -375,7 +381,7 @@ public class UserController {
                     System.out.println("There can't be a day like this");
                 } else {
                     try {
-                        date = new Date(year - 1900, month - 1, day);
+                        date = LocalDate.of(year, month, day);
                         break;
                     } catch (DateTimeException e) {
                         logger.error("Date validity error");
@@ -400,7 +406,7 @@ public class UserController {
             if (scanner.hasNextLong()) {
                 Long userId = scanner.nextLong();
 
-                updateUser = userImpl.getUserById(userId);
+                updateUser = userImpl.getById(userId);
                 if (updateUser == null) {
                     System.out.println("There is no user with this ID");
                     continue;
@@ -416,14 +422,14 @@ public class UserController {
         System.out.println("The user has a role: " + updateUser.getRole());
         boolean changeRole = false;
 
-        if (updateUser.getRole() == Role.user) {
+        if (updateUser.getRole() == Role.USER) {
             System.out.println("Do you want to promote to admin? (y/n)");
             scanner.nextLine();
             while (true) {
                 if (scanner.hasNextLine()){
                     String agreement = scanner.nextLine();
                     if(agreement.equals("y")) {
-                        updateUser.setRole(Role.admin);
+                        updateUser.setRole(Role.ADMIN);
                         changeRole = true;
                         break;
                     } else if (agreement.equals("n")) {
@@ -435,14 +441,14 @@ public class UserController {
             }
         }
 
-        if (updateUser.getRole() == Role.admin && !changeRole) {
+        if (updateUser.getRole() == Role.ADMIN && !changeRole) {
             System.out.println("Do you want to demote to user? (y/n)");
             scanner.nextLine();
             while (true) {
                 if (scanner.hasNextLine()) {
                     String agreement = scanner.nextLine();
                     if (agreement.equals("y")) {
-                        updateUser.setRole(Role.user);
+                        updateUser.setRole(Role.USER);
                         break;
                     } else if (agreement.equals("n")) {
                         break;
@@ -452,7 +458,7 @@ public class UserController {
                 }
             }
         }
-        userImpl.updateUser(updateUser);
+        userImpl.update(updateUser);
     }
 
     private static boolean deleteLoggerUser(boolean existenceAccount, User user) {
@@ -463,7 +469,7 @@ public class UserController {
             String agreement = scanner.nextLine();
             if(agreement.equals("y")) {
                 existenceAccount = false;
-                userImpl.deleteUserById(user.getId());
+                userImpl.deleteById(user.getId());
                 break;
             } else if (agreement.equals("n")) {
                 break;
@@ -483,7 +489,7 @@ public class UserController {
             try {
                 System.out.print("Enter user ID: ");
                 if (scanner.hasNextLong()) {
-                    System.out.println(userImpl.getUserById(scanner.nextLong()));
+                    System.out.println(userImpl.getById(scanner.nextLong()));
                     break;
                 } else {
                     System.out.println("Invalid input. Please try again");
@@ -520,7 +526,7 @@ public class UserController {
     private static void updateLoggedUser(User user) {
         int number;
         System.out.println("Update an account:");
-        System.out.println(userImpl.getUserById(user.getId()));
+        System.out.println(userImpl.getById(user.getId()));
 
         while(true) {
             System.out.println("""
@@ -550,7 +556,7 @@ public class UserController {
                 }
             }
             if (number == 0) {
-                userImpl.updateUser(user);
+                userImpl.update(user);
                 System.out.println("Update result:\n" + user);
                 break;
             }
@@ -570,7 +576,7 @@ public class UserController {
 
                 case 3:
                     System.out.println("Enter your date of birth");
-                    Date date = getDate();
+                    LocalDate date = getDate();
                     user.setDateOfBirth(date);
                     break;
 
@@ -603,7 +609,7 @@ public class UserController {
                             scanner.next();
                         }
                     }
-                    user.setGender(number == 1 ? Gender.male : Gender.female);
+                    user.setGender(number == 1 ? Gender.MALE : Gender.FEMALE);
                     break;
 
                 case 6:

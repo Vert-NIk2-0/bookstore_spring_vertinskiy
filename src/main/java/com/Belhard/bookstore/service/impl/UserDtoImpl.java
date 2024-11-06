@@ -1,13 +1,13 @@
-package com.Belhard.bookstore.service;
+package com.belhard.bookstore.service.impl;
 
-import com.Belhard.bookstore.dao.UserDao;
-import com.Belhard.bookstore.implementations.Implementation;
-import com.Belhard.bookstore.model.User;
-import com.Belhard.bookstore.model.UserDto;
+import com.belhard.bookstore.dao.UserDao;
+import com.belhard.bookstore.dao.entity.User;
+import com.belhard.bookstore.service.entity.UserDto;
+import com.belhard.bookstore.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class UserDtoImpl extends Implementation implements UserService{
+public class UserDtoImpl implements UserService {
 
     private final UserDao userDao;
     private static final Logger logger = LogManager.getLogger(UserDtoImpl.class);
@@ -27,14 +27,14 @@ public class UserDtoImpl extends Implementation implements UserService{
         user.setDateOfBirth(dto.getDateOfBirth());
         user.setGender(dto.getGender());
 
-        userDao.createUser(user);
+        userDao.create(user);
         logger.debug("A new user has been created");
     }
 
     @Override
     public User login(String email, String password) {
         try {
-            User user = userDao.getUserByEmail(email);
+            User user = userDao.getByEmail(email);
             if (user != null && user.getPassword().equals(password)) {
                 logger.debug("User is logged in");
                 return user;

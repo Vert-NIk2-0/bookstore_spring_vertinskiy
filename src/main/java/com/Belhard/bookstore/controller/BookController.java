@@ -1,17 +1,24 @@
-package com.Belhard.bookstore.controller;
+package com.belhard.bookstore.controller;
 
-import com.Belhard.bookstore.dao.BookImpl;
-import com.Belhard.bookstore.model.Book;
+import com.belhard.bookstore.connection.impl.ConnectionManagerImpl;
+import com.belhard.bookstore.dao.impl.BookDaoImpl;
+import com.belhard.bookstore.dao.entity.Book;
+import com.belhard.bookstore.connection.impl.PropertiesUtilImpl;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
 
 public class BookController {
-    public static void main(String[] args) {
-        BookImpl db = new BookImpl();
-        Scanner scanner = new Scanner(System.in);
+    private static final PropertiesUtilImpl PROPERTIES_UTIL_IMPL = new PropertiesUtilImpl("application.properties");
+    private static final String URL = PROPERTIES_UTIL_IMPL.get("db.url");
+    private static final String HOSTNAME = PROPERTIES_UTIL_IMPL.get("db.username");
+    private static final String PASSWORD = PROPERTIES_UTIL_IMPL.get("db.password");
+    private static final ConnectionManagerImpl CONNECTION_MANAGER_IMPL = new ConnectionManagerImpl(URL, HOSTNAME, PASSWORD);
+    private static final BookDaoImpl db = new BookDaoImpl(CONNECTION_MANAGER_IMPL);
+    private static final Scanner scanner = new Scanner(System.in);
 
+    public static void main(String[] args) {
         while(true) {
             System.out.println(
                     """
@@ -175,7 +182,7 @@ public class BookController {
                             }
                         }
                     }
-                    db.createBook(book);
+                    db.create(book);
                     System.out.println("You have added a book:\n" + book);
                     break;
 //================================================UPDATE============================================================
@@ -189,7 +196,7 @@ public class BookController {
                         if (scanner.hasNextInt()) {
                             idUpdate = scanner.nextLong();
                             if (idUpdate >=0) {
-                                book = db.getBookById(idUpdate);
+                                book = db.getById(idUpdate);
                                 scanner.nextLine();
                                 break;
                             } else {
@@ -230,7 +237,7 @@ public class BookController {
                             }
                         }
                         if (numberUpdate == 0) {
-                            db.updateBook(book);
+                            db.update(book);
                             System.out.println("Update result:\n" + book);
                             break;
                         }
@@ -365,7 +372,7 @@ public class BookController {
 //=====================================================ALL=BOOKS=======================================================
                 case 3:
                     System.out.println("Display information about all books:\n");
-                    db.getAllBooks().forEach(info -> System.out.println(info.printSomeFields()));
+                    db.getAll().forEach(info -> System.out.println(info.printSomeFields()));
                     break;
 //======================================================BY=AUTHOR=====================================================
                 case 4:
@@ -400,7 +407,7 @@ public class BookController {
 
                         if (isbnDisplay.matches("\\d{13}")) {
                             try {
-                                book = db.getBookByIsbn(isbnDisplay);
+                                book = db.getByIsbn(isbnDisplay);
                             }catch (RuntimeException e) {
                                 System.out.println("This ISBN does not exist");
                                 break;
@@ -422,7 +429,7 @@ public class BookController {
 
                         if (isbnRemove.matches("\\d{13}")) {
                             try {
-                                book = db.getBookByIsbn(isbnRemove);
+                                book = db.getByIsbn(isbnRemove);
                             }catch (RuntimeException e) {
                                 System.out.println("This ISBN does not exist");
                                 break;
@@ -436,7 +443,7 @@ public class BookController {
                     }
 
                     try {
-                        if (db.deleteBookByIsbn(isbnRemove)) {
+                        if (db.deleteByIsbn(isbnRemove)) {
                             System.out.println("Successfully!");
                         }
                     }catch (RuntimeException e) {

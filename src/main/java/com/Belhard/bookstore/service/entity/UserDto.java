@@ -1,9 +1,9 @@
-package com.Belhard.bookstore.model;
+package com.belhard.bookstore.service.entity;
 
-import com.Belhard.bookstore.enums.Gender;
+import com.belhard.bookstore.dao.entity.Gender;
 
 import java.text.SimpleDateFormat;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class UserDto {
@@ -11,7 +11,7 @@ public class UserDto {
     private String login;
     private String password;
     private String email;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     private Gender gender;
     private final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -47,11 +47,11 @@ public class UserDto {
         this.email = email;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

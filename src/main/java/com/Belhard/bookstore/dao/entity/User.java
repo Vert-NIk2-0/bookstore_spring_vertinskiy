@@ -1,10 +1,8 @@
-package com.Belhard.bookstore.model;
-
-import com.Belhard.bookstore.enums.Gender;
-import com.Belhard.bookstore.enums.Role;
+package com.belhard.bookstore.dao.entity;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class User {
@@ -12,13 +10,12 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     private String phoneNumber;
     private Gender gender;
     private String login;
     private String password;
     private Role role;
-    private final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 
     public Long getId() {
         return id;
@@ -52,11 +49,11 @@ public class User {
         this.email = email;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -105,12 +102,12 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(formatter.format(dateOfBirth), user.formatter.format(dateOfBirth)) && Objects.equals(phoneNumber, user.phoneNumber) && gender == user.gender && Objects.equals(login, user.login) && Objects.equals(password, user.password) && Objects.equals(role, user.role);
+        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(dateOfBirth, user.dateOfBirth) && Objects.equals(phoneNumber, user.phoneNumber) && gender == user.gender && Objects.equals(login, user.login) && Objects.equals(password, user.password) && Objects.equals(role, user.role);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email, formatter.format(dateOfBirth), phoneNumber, gender, login, password, role);
+        return Objects.hash(id, firstName, lastName, email, dateOfBirth, phoneNumber, gender, login, password, role);
     }
 
     @Override
@@ -120,7 +117,7 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", dateOfBirth=" + formatter.format(dateOfBirth) +
+                ", dateOfBirth=" + dateOfBirth +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", gender=" + gender +
                 ", login='" + login + '\'' +

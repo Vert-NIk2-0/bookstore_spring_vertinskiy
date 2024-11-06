@@ -1,27 +1,27 @@
-package com.Belhard.bookstore.dao;
+package com.belhard.bookstore.dao;
 
-import com.Belhard.bookstore.model.Book;
+import com.belhard.bookstore.dao.entity.Book;
 
 import java.util.List;
 
 public interface BookDao {
 
-    void createBook(Book book);
+    void create(Book book);
 
-    Book updateBook(Book book);
+    Book update(Book book);
 
-    List<Book> getAllBooks();
+    List<Book> getAll();
 
-    Book getBookByIsbn(String isbn);
+    Book getByIsbn(String isbn);
 
-    boolean deleteBookById(Long id);
+    boolean deleteById(Long id);
 
-    Book getBookById(Long id);
+    Book getById(Long id);
 
     List<Book> getByAuthor(String author);
 
-    boolean deleteBookByIsbn(String isbn);
+    boolean deleteByIsbn(String isbn);
 
-    Long countAll();
+    long countAll();
 
 }

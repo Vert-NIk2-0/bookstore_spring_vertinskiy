@@ -1,7 +1,7 @@
-package com.Belhard.bookstore.service;
+package com.belhard.bookstore.service;
 
-import com.Belhard.bookstore.model.User;
-import com.Belhard.bookstore.model.UserDto;
+import com.belhard.bookstore.dao.entity.User;
+import com.belhard.bookstore.service.entity.UserDto;
 
 public interface UserService {
 
