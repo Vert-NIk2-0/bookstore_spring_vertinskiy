@@ -9,7 +9,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <groupId>com.Belhard</groupId>
     <artifactId>bookstore</artifactId>
     <version>1.0</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -36,8 +36,27 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
+                    <configuration>
+                        <warName>bookstore</warName>
+                        <outputDirectory>${env.CATALINA_HOME}/webapps</outputDirectory>
+                    </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 
