@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookDaoImpl implements BookDao {
-    private static final String SELECT_ALL_BOOKS =
-            "SELECT id, bookname, author, year FROM books";
 
     private static final String SELECT_BOOK_BY_ISBN =
             "SELECT * FROM books WHERE isbn = ?";
@@ -35,8 +33,8 @@ public class BookDaoImpl implements BookDao {
             "UPDATE books " +
                     "SET author = ?, bookname = ?, isbn = ?, number_of_pages = ?, price = ?, year = ? WHERE id = ?";
 
-    private static final String SELECT_ALL_COLUMNS =
-            "SELECT author, bookname, isbn, number_of_pages, price, year FROM books";
+    private static final String SELECT_ALL_BOOKS =
+            "SELECT id, author, bookname, isbn, number_of_pages, price, year FROM books";
 
     private static final String SELECT_BOOK_BY_ID =
             "SELECT * FROM books WHERE id = ?";
@@ -101,14 +99,7 @@ public class BookDaoImpl implements BookDao {
             ResultSet resultSet = statement.executeQuery(SELECT_ALL_BOOKS);
             while (resultSet.next()) {
                 Book book = new Book();
-                try {
-                    book.setId(resultSet.getLong("id"));
-                    book.setAuthor(resultSet.getString("author"));
-                    book.setBookname(resultSet.getString("bookname"));
-                    book.setYear(resultSet.getObject("year"));
-                }catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+                setData(book, resultSet);
                 bookList.add(book);
 
             }

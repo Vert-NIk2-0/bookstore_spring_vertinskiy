@@ -172,7 +172,6 @@ public class UserDaoImpl implements UserDao {
                 return null;
             }
         }catch (SQLException e){
-            logger.error("Error displaying user by ID");
             throw new RuntimeException(e);
         }
         return user;
