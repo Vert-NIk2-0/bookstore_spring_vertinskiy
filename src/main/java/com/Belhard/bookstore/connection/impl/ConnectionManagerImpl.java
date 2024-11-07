@@ -14,15 +14,21 @@ public class ConnectionManagerImpl implements ConnectionManager {
     private final String USERNAME;
     private final String PASSWORD;
 
-    public ConnectionManagerImpl(String URL, String USERNAME, String PASSWORD) {
+    public ConnectionManagerImpl(String URL, String USERNAME, String PASSWORD, String driver) {
         this.URL = URL;
         this.USERNAME = USERNAME;
         this.PASSWORD = PASSWORD;
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Connection getConnection() {
         Connection connection;
         try {
+
             logger.info("Creating database connection");
             connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (SQLException e) {
