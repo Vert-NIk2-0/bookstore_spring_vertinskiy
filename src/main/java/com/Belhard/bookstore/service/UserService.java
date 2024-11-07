@@ -5,7 +5,7 @@ import com.belhard.bookstore.service.entity.UserDto;
 
 public interface UserService {
 
-    void createNewUser(UserDto dto);
+    void create(UserDto dto);
 
     User login(String email, String password);
 }

@@ -17,7 +17,7 @@ public class UserDtoImpl implements UserService {
     }
 
     @Override
-    public void createNewUser(UserDto dto) {
+    public void create(UserDto dto) {
         User user = new User();
 
         user.setId(dto.getId());
