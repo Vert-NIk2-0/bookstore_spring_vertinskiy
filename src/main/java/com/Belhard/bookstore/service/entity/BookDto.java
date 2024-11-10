@@ -1,4 +1,4 @@
-package com.Belhard.bookstore.model;
+package com.belhard.bookstore.service.entity;
 
 import java.util.Objects;
 

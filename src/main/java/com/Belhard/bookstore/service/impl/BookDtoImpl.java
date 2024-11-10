@@ -1,8 +1,9 @@
-package com.Belhard.bookstore.service;
+package com.belhard.bookstore.service.impl;
 
-import com.Belhard.bookstore.dao.BookDao;
-import com.Belhard.bookstore.model.Book;
-import com.Belhard.bookstore.model.BookDto;
+import com.belhard.bookstore.dao.BookDao;
+import com.belhard.bookstore.dao.entity.Book;
+import com.belhard.bookstore.service.entity.BookDto;
+import com.belhard.bookstore.service.BookService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class BookDtoImpl implements BookService {
     public List<BookDto> getAll() {
         List<BookDto> bookList = new ArrayList<>();
 
-        for (Book book : bookDao.getAllBooks()) {
+        for (Book book : bookDao.getAll()) {
 
             BookDto bookDto = new BookDto();
             setBookDto(bookDto, book);
@@ -33,7 +34,7 @@ public class BookDtoImpl implements BookService {
     @Override
     public BookDto getById(Long id) {
         BookDto bookDto = new BookDto();
-        Book book = bookDao.getBookById(id);
+        Book book = bookDao.getById(id);
 
         setBookDto(bookDto, book);
 
@@ -46,25 +47,25 @@ public class BookDtoImpl implements BookService {
 
         setBook(dto, book);
 
-        bookDao.createBook(book);
+        bookDao.create(book);
     }
 
     @Override
     public BookDto update(BookDto dto) {
 
-        Book book = bookDao.getBookById(dto.getId());
+        Book book = bookDao.getById(dto.getId());
 
         setBook(dto, book);
         System.out.println(book);
-        bookDao.updateBook(book);
+        bookDao.update(book);
         return dto;
     }
 
     @Override
     public boolean delete(Long id) {
-        bookDao.deleteBookById(id);
+        bookDao.deleteById(id);
 
-        return bookDao.deleteBookById(id);
+        return bookDao.deleteById(id);
     }
 
     @Override

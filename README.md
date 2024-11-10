@@ -2,7 +2,8 @@
 #### **Project Author**: Nikita Vertinskiy
 
 ## Application structure
-- Book class data:
+### Book class
+- Data:
   - Long ```id```
   - String ```author```
   - String ```bookname```
@@ -14,12 +15,12 @@
 
 - Methods [implemented](src/implementations/BookDao.java) in the project:
   - **CRUD** methods:
-    - **C**reate: ```void createBook(Book book)```
-    - **U**pdate: ```void updateRS(Book book);```
-    - **R**ead: ```List<Book> getAllBooks();```
-    - **D**elete: ```boolean deleteBookByIsbn(String isbn)```
+    - **C**reate: ```void create(Book book)```
+    - **U**pdate: ```void update(Book book);```
+    - **R**ead: ```List<Book> getAll();```
+    - **D**elete: ```boolean deleteByIsbn(String isbn)```
   - Additional methods:
-    - ```Book getBookByIsbn(String isbn)``` *displaying information about a book by ISBN*
+    - ```Book getByIsbn(String isbn)``` *displaying information about a book by ISBN*
     - ```List<Book> getByAuthor(String author)``` *list all books by a specific author*
   - Service methods:
     - ```List<BookDto> getAll()``` *displaying partial information about books*
@@ -34,24 +35,42 @@
 
     - ```BigDecimal getCostAuthorsBooks(String author)``` *displaying the cost of all books by a specific author*
 
+### User class
+- Data:
+  - Long ```id```
+  - String ```firstName```
+  - String ```lastName```
+  - String ```email``` *(optional)*
+  - LocalDate ```dateOfBirth``` *(optional)*
+  - String ```phoneNumber```
+  - Gender ```gender``` *(optional)*
+  - String ```login``` 
+  - String ```password``` *(optional)*
+  - Role ```role``` *(optional)*
+
+
+- Methods [implemented](src/implementations/UserDao.java) in the project:
+  - **CRUD** methods:
+    - **C**reate: ```void create(User user)```
+    - **U**pdate: ```User update(User user)```
+    - **R**ead: ```List<User> getAll()```
+    - **D**elete: ```boolean deleteById(Long id)```
+  - Additional methods:
+    - ```List<User> getByLastName(String lastName)``` *displaying information about a user by last name*
+    - ```User getById(Long id)``` *Displaying information about a user by ID*
+    - ```User getByEmail(String email)``` *Displaying information about a user by email*
+    - ```long countAll()``` Displaying count of users
+  - Service methods:
+    - ```void create(UserDto dto)``` *create new user*
+
+    - ```User login(String email, String password)``` *user authorization*
 
 ## Description of the application
-- When launching the application, the user is offered a choice of 8 actions:
-  > 1. [x] Add new book
-  > 2. [x] Update an existing book by ISBN
-  > 3. [x] Display information about all books
-  > 4. [x] Display information about the author's books
-  > 5. [x] Display information about a book by ISBN
-  > 6. [x] Delete book by ISBN
-  > 7. [x] Print the number of books
-  > 8. [x] Exit
-       
-- After selecting the desired item, it is transferred to the next menu, where the user will be shown the requested information, or offered options for adding/changing existing information.
+The user can view a list of all users or a list of all books. When you click on a nickname, it is redirected to the user’s page under that nickname. By clicking on a book, he can view more detailed information about this book.
 
 ## Upcoming Updates
 
 - Implement more advanced logic for using the application
-- Implement service layer methods
 - Add flexibility when launching an application
 - Fixing unaccounted bugs/errors
 - Completing the assignment from the next lecture
