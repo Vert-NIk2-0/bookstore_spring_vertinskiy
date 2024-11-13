@@ -66,11 +66,12 @@
     - ```User login(String email, String password)``` *user authorization*
 
 ## Description of the application
-The user can view a list of all users or a list of all books. When you click on a nickname, it is redirected to the user’s page under that nickname. By clicking on a book, he can view more detailed information about this book.
+The user can view a list of all users or a list of all books. When you click on a nickname, you are redirected to the user's page under that nickname. By clicking on a book, he can view more detailed information about that book.
+Also on each page there is a function to return to the previous page.
 
 ## Upcoming Updates
 
-- Implement more advanced logic for using the application
-- Add flexibility when launching an application
-- Fixing unaccounted bugs/errors
-- Completing the assignment from the next lecture
+- Implementation of more advanced logic for using the application.
+- Add more functionality to the application
+- Correction of unaccounted bugs/errors
+- Completing the assignment for the next lecture.
