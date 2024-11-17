@@ -1,41 +1,34 @@
 package com.belhard.bookstore.connection.impl;
 
 import com.belhard.bookstore.connection.ConnectionManager;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConnectionManagerImpl implements ConnectionManager {
-    private static final Logger logger = LogManager.getLogger(ConnectionManagerImpl.class);
-    private final String URL;
-    private final String USERNAME;
-    private final String PASSWORD;
+@Log4j2
+public class ConnectionManagerImpl implements ConnectionManager, Closeable {
+    private ConnectionPool connectionPool;
 
-    public ConnectionManagerImpl(String URL, String USERNAME, String PASSWORD, String driver) {
-        this.URL = URL;
-        this.USERNAME = USERNAME;
-        this.PASSWORD = PASSWORD;
-        try {
-            Class.forName(driver);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public ConnectionManagerImpl(String url, String username, String password, int poolSize, String driver) {
+        connectionPool = new ConnectionPool(driver, url, username, password, poolSize);
+        log.info("Connection pool initialized");
     }
 
+    @Override
     public Connection getConnection() {
-        Connection connection;
-        try {
+        return connectionPool.getConnection();
+    }
 
-            logger.info("Creating database connection");
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    @Override
+    public void close() throws IOException {
+        if (connectionPool != null) {
+            connectionPool.destroyPool();
+            connectionPool = null;
+            log.info("Connection pull destroyed");
         }
-
-        logger.debug("Accessing the database: {}", connection);
-        return connection;
     }
 }
