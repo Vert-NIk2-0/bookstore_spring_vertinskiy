@@ -1,9 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:application.properties"/>
+
+    <bean id="book" class="com.belhard.bookstore.controller.impl.BookCommand" lazy-init="true">
+        <constructor-arg ref="bookDao"/>
+    </bean>
+    <bean id="books" class="com.belhard.bookstore.controller.impl.BooksCommand" lazy-init="true">
+        <constructor-arg ref="bookDao"/>
+    </bean>
+    <bean id="user" class="com.belhard.bookstore.controller.impl.UserCommand" lazy-init="true">
+        <constructor-arg ref="userDao"/>
+    </bean>
+    <bean id="users" class="com.belhard.bookstore.controller.impl.UsersCommand" lazy-init="true">
+        <constructor-arg ref="userDao"/>
+    </bean>
+    <bean id="error" class="com.belhard.bookstore.controller.impl.ErrorCommand" lazy-init="true"/>
+    <bean id="bookDao" class="com.belhard.bookstore.dao.impl.BookDaoImpl" lazy-init="true">
+        <constructor-arg ref="connectionManager"/>
+    </bean>
+    <bean id="userDao" class="com.belhard.bookstore.dao.impl.UserDaoImpl" lazy-init="true">
+        <constructor-arg ref="connectionManager"/>
+    </bean>
 
 
+    <bean id="connectionPool" class="com.belhard.bookstore.connection.impl.ConnectionPool">
+        <constructor-arg value="${db.driver}"/>
+        <constructor-arg value="${db.url}"/>
+        <constructor-arg value="${db.username}"/>
+        <constructor-arg value="${db.password}"/>
+        <constructor-arg value="${db.poolSize}" type="int"/>
+    </bean>
+
+    <bean id="connectionManager" class="com.belhard.bookstore.connection.impl.ConnectionManagerImpl" lazy-init="true"/>
 
 </beans>
