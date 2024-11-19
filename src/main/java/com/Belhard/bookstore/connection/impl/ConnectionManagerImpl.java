@@ -1,6 +1,7 @@
 package com.belhard.bookstore.connection.impl;
 
 import com.belhard.bookstore.connection.ConnectionManager;
+import com.belhard.bookstore.controller.AppListener;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Closeable;
@@ -13,8 +14,8 @@ import java.sql.SQLException;
 public class ConnectionManagerImpl implements ConnectionManager, Closeable {
     private ConnectionPool connectionPool;
 
-    public ConnectionManagerImpl(String url, String username, String password, int poolSize, String driver) {
-        connectionPool = new ConnectionPool(driver, url, username, password, poolSize);
+    public ConnectionManagerImpl() {
+        connectionPool = AppListener.getContext().getBean("connectionPool", ConnectionPool.class);
         log.info("Connection pool initialized");
     }
 
