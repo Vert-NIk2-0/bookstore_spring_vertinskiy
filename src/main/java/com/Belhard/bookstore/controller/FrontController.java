@@ -1,5 +1,6 @@
 package com.belhard.bookstore.controller;
 
+import com.belhard.bookstore.controller.impl.ErrorCommand;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,12 +18,12 @@ public class FrontController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             String commandParam = req.getParameter("command");
-            Command command = CommandFactory.INSTANCE.get(commandParam);
+            Command command = AppListener.getContext().getBean(commandParam, Command.class);
             String page = command.process(req);
             req.getRequestDispatcher(page).forward(req, resp);
         } catch (Exception e) {
             log.error(e);
-            Command command = CommandFactory.INSTANCE.get("error");
+            Command command = AppListener.getContext().getBean(ErrorCommand.class);
             String page = command.process(req);
             req.getRequestDispatcher(page).forward(req, resp);
         }
