@@ -5,16 +5,20 @@ import com.belhard.bookstore.dao.entity.Gender;
 import com.belhard.bookstore.dao.entity.Role;
 import com.belhard.bookstore.dao.UserDao;
 import com.belhard.bookstore.dao.entity.User;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
+@Repository
 public class UserDaoImpl implements UserDao {
-
-    private static final Logger logger = LogManager.getLogger(UserDaoImpl.class);
 
     private static final String SELECT_ALL_USERS =
             "SELECT u.id, u.first_name, u.last_name, u.email, u,date_of_birth, u.phone_number, g.gender, u.login, u.password, r.role " +
@@ -67,6 +71,7 @@ public class UserDaoImpl implements UserDao {
 
     private final ConnectionManagerImpl connectionManagerImpl;
 
+    @Autowired
     public UserDaoImpl(ConnectionManagerImpl connectionManagerImpl) {
         this.connectionManagerImpl = connectionManagerImpl;
     }
@@ -86,7 +91,7 @@ public class UserDaoImpl implements UserDao {
             user.setId(generatedKeys.getLong("id"));
 
         }catch (SQLException e) {
-            logger.error("Error creating user");
+            log.error("Error creating user");
             throw new RuntimeException(e);
         }
     }
@@ -106,7 +111,7 @@ public class UserDaoImpl implements UserDao {
             statement.executeUpdate();
 
         }catch (SQLException e){
-            logger.error("Error updating user");
+            log.error("Error updating user");
             throw new RuntimeException(e);
         }
         return user;
@@ -128,7 +133,7 @@ public class UserDaoImpl implements UserDao {
                 userList.add(user);
             }
         }catch (SQLException e) {
-            logger.error("Error displaying user list");
+            log.error("Error displaying user list");
             throw new RuntimeException(e);
         }
         return userList;
@@ -149,7 +154,7 @@ public class UserDaoImpl implements UserDao {
                 userList.add(user);
             }
         }catch (SQLException e){
-            logger.error("Error displaying user list by last name");
+            log.error("Error displaying user list by last name");
             throw new RuntimeException(e);
         }
         return userList;
@@ -194,7 +199,7 @@ public class UserDaoImpl implements UserDao {
                 return null;
             }
         }catch (SQLException e){
-            logger.error("Error displaying user by email");
+            log.error("Error displaying user by email");
             throw new RuntimeException(e);
         }
         return user;
@@ -209,7 +214,7 @@ public class UserDaoImpl implements UserDao {
             statement.setLong(1, id);
             return statement.executeUpdate() == 1;
         }catch (SQLException e){
-            logger.error("Error deleting user");
+            log.error("Error deleting user");
             throw new RuntimeException(e);
         }
     }
@@ -225,7 +230,7 @@ public class UserDaoImpl implements UserDao {
             if (resultSet.next())
                 rowCount = resultSet.getLong("row_count");
         } catch (SQLException e) {
-            logger.error("Error displaying the number of users");
+            log.error("Error displaying the number of users");
             throw new RuntimeException(e);
         }
         return rowCount;
@@ -242,7 +247,7 @@ public class UserDaoImpl implements UserDao {
 
             return resultSet.getInt("id");
         } catch (SQLException e) {
-            logger.error("Error getting gender id");
+            log.error("Error getting gender id");
             throw new RuntimeException(e);
         }
     }
@@ -258,7 +263,7 @@ public class UserDaoImpl implements UserDao {
 
             return resultSet.getInt("id");
         } catch (SQLException e) {
-            logger.error("Error getting role id");
+            log.error("Error getting role id");
             throw new RuntimeException(e);
         }
     }
