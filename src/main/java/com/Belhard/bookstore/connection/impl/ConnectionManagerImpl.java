@@ -13,8 +13,8 @@ import java.sql.SQLException;
 public class ConnectionManagerImpl implements ConnectionManager, Closeable {
     private ConnectionPool connectionPool;
 
-    public ConnectionManagerImpl(String url, String username, String password, int poolSize, String driver) {
-        connectionPool = new ConnectionPool(driver, url, username, password, poolSize);
+    public ConnectionManagerImpl(ConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
         log.info("Connection pool initialized");
     }
 

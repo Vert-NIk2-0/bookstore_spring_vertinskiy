@@ -13,7 +13,7 @@ public class ConnectionPool {
     private final BlockingQueue<ProxyConnection> freeConnections;
     private final int poolSize;
 
-    ConnectionPool(String driver, String url, String user, String password, int poolSize) {
+    public ConnectionPool(String driver, String url, String user, String password, int poolSize) {
         this.poolSize = poolSize;
         this.freeConnections = new LinkedBlockingDeque<>();
         try {
