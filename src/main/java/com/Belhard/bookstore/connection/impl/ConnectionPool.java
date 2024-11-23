@@ -1,6 +1,9 @@
 package com.belhard.bookstore.connection.impl;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,13 +12,19 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 @Log4j2
+@Component
 public class ConnectionPool {
     private final BlockingQueue<ProxyConnection> freeConnections;
     private final int poolSize;
 
-    ConnectionPool(String driver, String url, String user, String password, int poolSize) {
-        this.poolSize = poolSize;
+    @Autowired
+    public ConnectionPool(@Value("${db.driver}") String driver,
+                          @Value("${db.url}") String url,
+                          @Value("${db.username}") String user,
+                          @Value("${db.password}") String password,
+                          @Value("${db.poolSize}") int poolSize) {
         this.freeConnections = new LinkedBlockingDeque<>();
+        this.poolSize = poolSize;
         try {
             Class.forName(driver);
             log.info("Database driver loaded");

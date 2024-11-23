@@ -6,11 +6,15 @@ import com.belhard.bookstore.dao.entity.Book;
 import com.belhard.bookstore.dao.impl.BookDaoImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @RequiredArgsConstructor
+@Component("books")
 public class BooksCommand implements Command {
+
     private final BookDao bookDao;
 
     @Override

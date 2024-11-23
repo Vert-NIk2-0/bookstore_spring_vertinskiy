@@ -3,6 +3,10 @@ package com.belhard.bookstore.dao.impl;
 import com.belhard.bookstore.dao.BookDao;
 import com.belhard.bookstore.connection.impl.ConnectionManagerImpl;
 import com.belhard.bookstore.dao.entity.Book;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +16,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
+@Repository
 public class BookDaoImpl implements BookDao {
 
     private static final String SELECT_BOOK_BY_ISBN =
@@ -45,9 +51,11 @@ public class BookDaoImpl implements BookDao {
 
     private final ConnectionManagerImpl connectionManagerImpl;
 
+    @Autowired
     public BookDaoImpl(ConnectionManagerImpl connectionManagerImpl) {
         this.connectionManagerImpl = connectionManagerImpl;
     }
+
     @Override
     public void create(Book book) {
 

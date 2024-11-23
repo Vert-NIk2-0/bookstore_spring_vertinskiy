@@ -16,6 +16,8 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <maven.compiler.target>21</maven.compiler.target>
         <log4j.version>2.24.1</log4j.version>
         <postgres.version>42.7.4</postgres.version>
+        <lombok.version>1.18.34</lombok.version>
+        <spring.version>6.1.14</spring.version>
     </properties>
 
     <dependencies>
@@ -60,8 +62,14 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
     </dependencies>
@@ -86,7 +94,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.34</version>
+                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

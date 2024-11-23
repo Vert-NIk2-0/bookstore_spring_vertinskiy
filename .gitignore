@@ -33,3 +33,6 @@ bin/
 ### Maven ###
 target/
 logs/
+
+### Tomcat ###
+.smarttomcat
