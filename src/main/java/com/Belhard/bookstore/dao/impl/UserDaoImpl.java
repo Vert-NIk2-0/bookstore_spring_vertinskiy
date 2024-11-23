@@ -5,18 +5,21 @@ import com.belhard.bookstore.dao.entity.Gender;
 import com.belhard.bookstore.dao.entity.Role;
 import com.belhard.bookstore.dao.UserDao;
 import com.belhard.bookstore.dao.entity.User;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
+@RequiredArgsConstructor
 @Repository
 public class UserDaoImpl implements UserDao {
 
@@ -27,16 +30,25 @@ public class UserDaoImpl implements UserDao {
                     "JOIN roles r ON u.role_id = r.id " +
                     "ORDER BY u.id";
 
-    private static final String USERS_SIZE =
+    private static final String COUNT_ALL =
             "SELECT COUNT(*) AS row_count FROM users";
 
     private static final String INSERT_USER =
             "INSERT INTO users (first_name, last_name, email, date_of_birth, phone_number, gender_id, login, password)" +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public static final String UPDATE_USER =
-            "UPDATE users " +
-                    "SET first_name = ?, last_name = ?, email = ?, date_of_birth = ?, phone_number = ?, gender_id = ?, login = ?, password = ?, role_id = ? WHERE id = ?";
+    public static final String UPDATE_USER_NP =
+            "UPDATE users SET " +
+                "first_name = :first_name, " +
+                "last_name = :last_name, " +
+                "email = :email, " +
+                "date_of_birth = :date_of_birth, " +
+                "phone_number = :phone_number, " +
+                "gender_id = :gender_id, " +
+                "login = :login, " +
+                "password = :password, " +
+                "role_id = :role_id " +
+            "WHERE id = :id";
 
     private static final String GET_GENDER_ID =
             "SELECT id FROM genders WHERE gender::text = ?";
@@ -70,225 +82,113 @@ public class UserDaoImpl implements UserDao {
 
 
     private final ConnectionManagerImpl connectionManagerImpl;
-
-    @Autowired
-    public UserDaoImpl(ConnectionManagerImpl connectionManagerImpl) {
-        this.connectionManagerImpl = connectionManagerImpl;
-    }
+    private final JdbcTemplate template;
+    private final NamedParameterJdbcTemplate namedTemplate;
 
     @Override
-    public void create(User user) {
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS)
-        ) {
-            setStatement(user, statement);
-
-            statement.executeUpdate();
-
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            generatedKeys.next();
-            user.setId(generatedKeys.getLong("id"));
-
-        }catch (SQLException e) {
-            log.error("Error creating user");
-            throw new RuntimeException(e);
-        }
+    public User create(User user) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        template.update((connectionManagerImpl) -> getStatement(user), keyHolder);
+        Long keyAs = keyHolder.getKeyAs(Long.class);
+        return getById(keyAs);
     }
 
     @Override
     public User update(User user) {
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(UPDATE_USER)
-        ) {
-
-            setStatement(user, statement);
-
-            statement.setInt(9, getRoleId(user.getRole()));
-            statement.setLong(10, user.getId());
-
-            statement.executeUpdate();
-
-        }catch (SQLException e){
-            log.error("Error updating user");
-            throw new RuntimeException(e);
-        }
-        return user;
+        namedTemplate.update(UPDATE_USER_NP, getMap(user));
+        return getById(user.getId());
     }
 
     @Override
     public List<User> getAll() {
-        List<User> userList = new ArrayList<>();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                Statement statement = connection.createStatement()
-        ){
-            ResultSet resultSet = statement.executeQuery(SELECT_ALL_USERS);
-            while (resultSet.next()) {
-                User user = new User();
-
-                setBook(user, resultSet);
-
-                userList.add(user);
-            }
-        }catch (SQLException e) {
-            log.error("Error displaying user list");
-            throw new RuntimeException(e);
-        }
-        return userList;
+        return template.query(SELECT_ALL_USERS, this::setBook);
     }
 
     @Override
     public List<User> getByLastName(String lastName) {
-        List<User> userList = new ArrayList<>();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_USERS_BY_LASTNAME)
-        ) {
-            statement.setString(1, lastName);
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                User user = new User();
-                setBook(user, resultSet);
-                userList.add(user);
-            }
-        }catch (SQLException e){
-            log.error("Error displaying user list by last name");
-            throw new RuntimeException(e);
-        }
-        return userList;
+        return template.query(GET_USERS_BY_LASTNAME, this::setBook, lastName);
     }
 
     @Override
     public User getById(Long id) {
-        User user = new User();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_USER_BY_ID)
-        ) {
-            statement.setLong(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()) {
-
-                setBook(user, resultSet);
-
-            } else {
-                return null;
-            }
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-        return user;
+        return template.queryForObject(GET_USER_BY_ID, this::setBook, id);
     }
 
     @Override
     public User getByEmail(String email) {
+        return template.queryForObject(GET_USER_BY_EMAIL, this::setBook, email);
+    }
+
+    @Override
+    public boolean deleteById(Long id) {
+        return template.update(DELETE_USER_BY_ID, id) == 1;
+    }
+
+    @Override
+    public long countAll() {
+        Long count = template.queryForObject(COUNT_ALL, ((rs, rowNum) -> rs.getLong("row_count")));
+        return count != null ? count : 0L;
+
+    }
+
+    private Integer getGenderId (Gender gender) {
+        return template.queryForObject(GET_GENDER_ID, ((rs, rowNum) -> rs.getInt("id")), String.valueOf(gender).toLowerCase());
+    }
+
+    private Integer getRoleId (Role role) {
+        return template.queryForObject(GET_ROLE_ID, ((rs, rowNum) -> rs.getInt("id")), String.valueOf(role).toLowerCase());
+    }
+
+    private User setBook(ResultSet resultSet, int row){
         User user = new User();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_USER_BY_EMAIL)
-        ) {
-            statement.setString(1, email);
-            ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()) {
-
-                setBook(user, resultSet);
-
-            } else {
-                return null;
-            }
-        }catch (SQLException e){
-            log.error("Error displaying user by email");
+        try {
+            user.setId(resultSet.getLong("id"));
+            user.setFirstName(resultSet.getString("first_name"));
+            user.setLastName(resultSet.getString("last_name"));
+            user.setEmail(resultSet.getString("email"));
+            user.setDateOfBirth(resultSet.getDate("date_of_birth").toLocalDate());
+            user.setPhoneNumber(resultSet.getString("phone_number"));
+            user.setGender(Gender.valueOf(resultSet.getString("gender").toUpperCase()));
+            user.setLogin(resultSet.getString("login"));
+            user.setPassword(resultSet.getString("password"));
+            user.setRole(Role.valueOf(resultSet.getString("role").toUpperCase()));
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return user;
     }
 
-    @Override
-    public boolean deleteById(Long id) {
+    private PreparedStatement getStatement(User user) {
         try (
                 Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(DELETE_USER_BY_ID)
+                PreparedStatement statement = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS)
         ) {
-            statement.setLong(1, id);
-            return statement.executeUpdate() == 1;
-        }catch (SQLException e){
-            log.error("Error deleting user");
+            statement.setString(1, user.getFirstName());
+            statement.setString(2, user.getLastName());
+            statement.setString(3, user.getEmail());
+            statement.setDate(4, Date.valueOf(user.getDateOfBirth()));
+            statement.setString(5, user.getPhoneNumber());
+            statement.setInt(6, getGenderId(user.getGender()));
+            statement.setString(7, user.getLogin());
+            statement.setString(8, user.getPassword());
+            return statement;
+        }catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
-    public long countAll() {
-        long rowCount = 0L;
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                Statement statement = connection.createStatement()
-        ){
-            ResultSet resultSet = statement.executeQuery(USERS_SIZE);
-            if (resultSet.next())
-                rowCount = resultSet.getLong("row_count");
-        } catch (SQLException e) {
-            log.error("Error displaying the number of users");
-            throw new RuntimeException(e);
-        }
-        return rowCount;
-    }
-
-    private Integer getGenderId (Gender gender) {
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_GENDER_ID)
-        ){
-            statement.setString(1, String.valueOf(gender).toLowerCase());
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-
-            return resultSet.getInt("id");
-        } catch (SQLException e) {
-            log.error("Error getting gender id");
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Integer getRoleId (Role role) {
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_ROLE_ID)
-        ){
-            statement.setString(1, String.valueOf(role).toLowerCase());
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-
-            return resultSet.getInt("id");
-        } catch (SQLException e) {
-            log.error("Error getting role id");
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void setBook(User user, ResultSet resultSet) throws SQLException {
-        user.setId(resultSet.getLong("id"));
-        user.setFirstName(resultSet.getString("first_name"));
-        user.setLastName(resultSet.getString("last_name"));
-        user.setEmail(resultSet.getString("email"));
-        user.setDateOfBirth(resultSet.getDate("date_of_birth").toLocalDate());
-        user.setPhoneNumber(resultSet.getString("phone_number"));
-        user.setGender(Gender.valueOf(resultSet.getString("gender").toUpperCase()));
-        user.setLogin(resultSet.getString("login"));
-        user.setPassword(resultSet.getString("password"));
-        user.setRole(Role.valueOf(resultSet.getString("role").toUpperCase()));
-    }
-
-    private void setStatement(User user, PreparedStatement statement) throws SQLException {
-        statement.setString(1, user.getFirstName());
-        statement.setString(2, user.getLastName());
-        statement.setString(3, user.getEmail());
-        statement.setDate(4, Date.valueOf(user.getDateOfBirth()));
-        statement.setString(5, user.getPhoneNumber());
-        statement.setInt(6, getGenderId(user.getGender()));
-        statement.setString(7, user.getLogin());
-        statement.setString(8, user.getPassword());
+    private Map<String, Object> getMap(User user) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("first_name", user.getFirstName());
+        map.put("last_name", user.getLastName());
+        map.put("email", user.getEmail());
+        map.put("date_of_birth", Date.valueOf(user.getDateOfBirth()));
+        map.put("phone_number", user.getPhoneNumber());
+        map.put("gender_id", getGenderId(user.getGender()));
+        map.put("login", user.getLogin());
+        map.put("password", user.getPassword());
+        map.put("role_id", getRoleId(user.getRole()));
+        map.put("id", user.getId());
+        return map;
     }
 }
