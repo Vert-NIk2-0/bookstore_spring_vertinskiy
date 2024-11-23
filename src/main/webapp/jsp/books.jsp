@@ -17,9 +17,15 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .book-list {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+            flex: 1;
         }
         .book-card {
             background-color: #fff;
@@ -63,15 +69,17 @@
 </head>
 <body>
     <div class="container">
-        <c:forEach items="${books}" var="book">
-            <div class="book-card">
-                <h1><a href="/controller?command=book&id=${book.id}">${book.bookname}</a></h1>
-                <p><span>Author:</span> ${book.author}</p>
-                <p><span>Year:</span> ${book.year}</p>
-                <p><span>Price:</span> ${book.price}$</p>
-            </div>
-        </c:forEach>
-        <a href="/" class="btn-back">Back to Home</a>
+        <div class="book-list">
+            <c:forEach items="${books}" var="book">
+                <div class="book-card">
+                    <h1><a href="controller?command=book&id=${book.id}">${book.bookname}</a></h1>
+                    <p><span>Author:</span> ${book.author}</p>
+                    <p><span>Year:</span> ${book.year}</p>
+                    <p><span>Price:</span> ${book.price}$</p>
+                </div>
+            </c:forEach>
+        </div>
+        <a href="/bookstore" class="btn-back">Back to Home</a>
     </div>
 </body>
 </html>
