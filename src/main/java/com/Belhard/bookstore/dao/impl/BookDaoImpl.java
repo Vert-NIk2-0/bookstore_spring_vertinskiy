@@ -3,8 +3,10 @@ package com.belhard.bookstore.dao.impl;
 import com.belhard.bookstore.dao.BookDao;
 import com.belhard.bookstore.connection.impl.ConnectionManagerImpl;
 import com.belhard.bookstore.dao.entity.Book;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
+@RequiredArgsConstructor
 @Repository
 public class BookDaoImpl implements BookDao {
 
@@ -50,11 +53,7 @@ public class BookDaoImpl implements BookDao {
             "SELECT * FROM books WHERE id = ?";
 
     private final ConnectionManagerImpl connectionManagerImpl;
-
-    @Autowired
-    public BookDaoImpl(ConnectionManagerImpl connectionManagerImpl) {
-        this.connectionManagerImpl = connectionManagerImpl;
-    }
+    private final JdbcTemplate template;
 
     @Override
     public void create(Book book) {
@@ -103,80 +102,22 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public List<Book> getAll() {
-        List<Book> bookList = new ArrayList<>();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                Statement statement = connection.createStatement()
-        ){
-            ResultSet resultSet = statement.executeQuery(SELECT_ALL_BOOKS);
-            while (resultSet.next()) {
-                Book book = new Book();
-                setData(book, resultSet);
-                bookList.add(book);
-
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return bookList;
+        return template.query(SELECT_ALL_BOOKS, this::setData);
     }
 
     @Override
     public Book getByIsbn(String isbn) {
-        Book book = new Book();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT_BOOK_BY_ISBN)
-        ){
-            statement.setString(1, isbn);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-
-            setData(book, resultSet);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return book;
+        return template.queryForObject(SELECT_BOOK_BY_ISBN, this::setData, isbn);
     }
 
     @Override
     public Book getById(Long id) {
-        Book book = new Book();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT_BOOK_BY_ID)
-        ){
-            statement.setLong(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-
-            setData(book, resultSet);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return book;
+        return template.queryForObject(SELECT_BOOK_BY_ID, this::setData, id);
     }
 
     @Override
     public List<Book> getByAuthor(String author) {
-        List<Book> bookList = new ArrayList<>();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT_BOOK_BY_AUTHOR)
-        ){
-            statement.setString(1, author);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Book book = new Book();
-                setData(book, resultSet);
-                bookList.add(book);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return bookList;
+        return template.query(SELECT_BOOK_BY_AUTHOR, this::setData, author);
     }
 
     @Override
@@ -227,7 +168,8 @@ public class BookDaoImpl implements BookDao {
         return rowCount;
     }
 
-    private void setData(Book book, ResultSet resultSet) {
+    private Book setData(ResultSet resultSet, int row) {
+        Book book = new Book();
         try {
             book.setId(resultSet.getLong("id"));
             book.setAuthor(resultSet.getString("author"));
@@ -239,5 +181,6 @@ public class BookDaoImpl implements BookDao {
         }catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return book;
     }
 }
