@@ -3,9 +3,12 @@ package com.belhard.bookstore.dao.impl;
 import com.belhard.bookstore.dao.BookDao;
 import com.belhard.bookstore.connection.impl.ConnectionManagerImpl;
 import com.belhard.bookstore.dao.entity.Book;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -13,10 +16,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
+@RequiredArgsConstructor
 @Repository
 public class BookDaoImpl implements BookDao {
 
@@ -26,7 +31,7 @@ public class BookDaoImpl implements BookDao {
     private static final String SELECT_BOOK_BY_AUTHOR =
             "SELECT * FROM books WHERE author = ?";
 
-    private static final String SIZE_DATABASE =
+    private static final String COUNT_ALL =
             "SELECT COUNT(*) AS row_count FROM books";
 
     private static final String DELETE_BOOK_BY_ISBN =
@@ -43,6 +48,10 @@ public class BookDaoImpl implements BookDao {
             "UPDATE books " +
                     "SET author = ?, bookname = ?, isbn = ?, number_of_pages = ?, price = ?, year = ? WHERE id = ?";
 
+    private static final String UPDATE_BOOK_BY_ID_NP =
+            "UPDATE books " +
+                    "SET author = :author, bookname = :bookname, isbn = :isbn, number_of_pages = :number_of_pages, price = :price, year = :year WHERE id = :id";
+
     private static final String SELECT_ALL_BOOKS =
             "SELECT id, author, bookname, isbn, number_of_pages, price, year FROM books";
 
@@ -50,184 +59,61 @@ public class BookDaoImpl implements BookDao {
             "SELECT * FROM books WHERE id = ?";
 
     private final ConnectionManagerImpl connectionManagerImpl;
-
-    @Autowired
-    public BookDaoImpl(ConnectionManagerImpl connectionManagerImpl) {
-        this.connectionManagerImpl = connectionManagerImpl;
-    }
+    private final JdbcTemplate template;
+    private final NamedParameterJdbcTemplate namedTemplate;
 
     @Override
-    public void create(Book book) {
-
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(CREATE_BOOK, Statement.RETURN_GENERATED_KEYS)
-        ){
-            statement.setString(1, book.getAuthor());
-            statement.setString(2, book.getBookname());
-            statement.setString(3, book.getIsbn());
-            statement.setObject(4, book.getNumberOfPages());
-            statement.setBigDecimal(5, book.getPrice());
-            statement.setObject(6, book.getYear());
-            statement.executeUpdate();
-
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            generatedKeys.next();
-            book.setId(generatedKeys.getLong("id"));
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public Book create(Book book) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        template.update((connectionManagerImpl) -> getStatement(book), keyHolder);
+        Long key = keyHolder.getKeyAs(Long.class);
+        return getById(key);
     }
 
     @Override
     public Book update(Book book) {
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(UPDATE_BOOK_BY_ID)
-        ) {
-            statement.setString(1, book.getAuthor());
-            statement.setString(2, book.getBookname());
-            statement.setString(3, book.getIsbn());
-            statement.setObject(4, book.getNumberOfPages());
-            statement.setBigDecimal(5, book.getPrice());
-            statement.setObject(6, book.getYear());
-            statement.setLong(7, book.getId());
-
-            statement.executeUpdate();
-        }catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return book;
+        namedTemplate.update(UPDATE_BOOK_BY_ID_NP, getMap(book));
+        return getById(book.getId());
     }
 
     @Override
     public List<Book> getAll() {
-        List<Book> bookList = new ArrayList<>();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                Statement statement = connection.createStatement()
-        ){
-            ResultSet resultSet = statement.executeQuery(SELECT_ALL_BOOKS);
-            while (resultSet.next()) {
-                Book book = new Book();
-                setData(book, resultSet);
-                bookList.add(book);
-
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return bookList;
+        return template.query(SELECT_ALL_BOOKS, this::setData);
     }
 
     @Override
     public Book getByIsbn(String isbn) {
-        Book book = new Book();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT_BOOK_BY_ISBN)
-        ){
-            statement.setString(1, isbn);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-
-            setData(book, resultSet);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return book;
+        return template.queryForObject(SELECT_BOOK_BY_ISBN, this::setData, isbn);
     }
 
     @Override
     public Book getById(Long id) {
-        Book book = new Book();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT_BOOK_BY_ID)
-        ){
-            statement.setLong(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-
-            setData(book, resultSet);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return book;
+        return template.queryForObject(SELECT_BOOK_BY_ID, this::setData, id);
     }
 
     @Override
     public List<Book> getByAuthor(String author) {
-        List<Book> bookList = new ArrayList<>();
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT_BOOK_BY_AUTHOR)
-        ){
-            statement.setString(1, author);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Book book = new Book();
-                setData(book, resultSet);
-                bookList.add(book);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return bookList;
+        return template.query(SELECT_BOOK_BY_AUTHOR, this::setData, author);
     }
 
     @Override
     public boolean deleteByIsbn(String isbn) {
-        int resultUpdate;
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(DELETE_BOOK_BY_ISBN)
-        ){
-            statement.setString(1, isbn);
-            resultUpdate = statement.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return resultUpdate > 0;
+        return template.update(DELETE_BOOK_BY_ISBN, isbn) == 1;
     }
 
     @Override
     public boolean deleteById(Long id) {
-        int resultUpdate = 0;
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                PreparedStatement statement = connection.prepareStatement(DELETE_BOOK_BY_ID)
-        ){
-            statement.setLong(1, id);
-            resultUpdate = statement.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return resultUpdate > 0;
+        return template.update(DELETE_BOOK_BY_ID, id) == 1;
     }
 
     @Override
     public long countAll() {
-        long rowCount = 0L;
-        try (
-                Connection connection = connectionManagerImpl.getConnection();
-                Statement statement = connection.createStatement()
-        ){
-            ResultSet resultSet = statement.executeQuery(SIZE_DATABASE);
-            if (resultSet.next())
-                rowCount = resultSet.getLong("row_count");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return rowCount;
+        Long count = template.queryForObject(COUNT_ALL, (rs, rowNum) -> rs.getLong("row_count"));
+        return count != null ? count : 0L;
     }
 
-    private void setData(Book book, ResultSet resultSet) {
+    private Book setData(ResultSet resultSet, int row) {
+        Book book = new Book();
         try {
             book.setId(resultSet.getLong("id"));
             book.setAuthor(resultSet.getString("author"));
@@ -239,5 +125,36 @@ public class BookDaoImpl implements BookDao {
         }catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return book;
+    }
+
+    private Map<String, Object> getMap(Book book) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", book.getId());
+        map.put("year", book.getYear());
+        map.put("number_of_pages", book.getNumberOfPages());
+        map.put("isbn", book.getIsbn());
+        map.put("author", book.getAuthor());
+        map.put("bookname", book.getBookname());
+        map.put("price", book.getPrice());
+        return map;
+    }
+
+    private PreparedStatement getStatement(Book book) {
+        try (
+                Connection connection = connectionManagerImpl.getConnection();
+                PreparedStatement statement = connection.prepareStatement(CREATE_BOOK, Statement.RETURN_GENERATED_KEYS)
+        ){
+            statement.setString(1, book.getAuthor());
+            statement.setString(2, book.getBookname());
+            statement.setString(3, book.getIsbn());
+            statement.setObject(4, book.getNumberOfPages());
+            statement.setBigDecimal(5, book.getPrice());
+            statement.setObject(6, book.getYear());
+            return statement;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

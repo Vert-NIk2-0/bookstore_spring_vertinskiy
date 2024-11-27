@@ -5,7 +5,7 @@ import com.belhard.bookstore.dao.entity.User;
 import java.util.List;
 
 public interface UserDao {
-    void create(User user);
+    User create(User user);
 
     User update(User user);
 

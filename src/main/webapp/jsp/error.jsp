@@ -50,7 +50,7 @@
         <h1>Oops! Invalid Request</h1>
         <p>It seems like the action you requested is not valid.</p>
         <p>Please check the request and try again.</p>
-        <a href="/" class="btn">Go Back to Home</a>
+        <a href="/bookstore" class="btn">Go Back to Home</a>
     </div>
 </body>
 </html>

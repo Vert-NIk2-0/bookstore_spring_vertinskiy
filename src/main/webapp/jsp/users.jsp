@@ -76,12 +76,12 @@
                 <div class="user-card">
                     <h1><span>${user.login}</span></h1>
                     <p><span>ID:</span> ${user.id}</p>
-                    <p><a href="/controller?command=user&id=${user.id}">${user.email}</a></p>
+                    <p><a href="controller?command=user&id=${user.id}">${user.email}</a></p>
                     <p><span>Phone Number:</span> ${user.phoneNumber}</p>
                 </div>
             </c:forEach>
         </div>
-        <a href="/" class="btn-back">Back to Home</a>
+        <a href="/bookstore" class="btn-back">Back to Home</a>
     </div>
 </body>
 </html>
